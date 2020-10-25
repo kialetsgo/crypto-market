@@ -1,0 +1,25 @@
+<%- include('../partials/header'); %>
+
+<div class="container">
+
+    <h1><%= pageTitle %></h1>
+
+    <form method="POST" action="/user/login">
+        <!-- Email -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" name="email" id="email">
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password" id="password">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+</div>
+
+<%- include('../partials/footer'); %>
