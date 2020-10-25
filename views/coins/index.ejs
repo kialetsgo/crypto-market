@@ -1,0 +1,39 @@
+<%- include('../partials/header'); %>
+<div class="container mb-5">
+    <div class="text-center mt-5 mb-5">
+        <h1><%= pageHeader %></h1>
+    </div>
+    <table id="main-table" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Market Cap</th>
+                <th scope="col">Price</th>
+                <th scope="col">Circulating Supply</th>
+                <th scope="col">Volume(24h)</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% currencies.data.forEach((item,idx) => { %>
+            <tr>
+                <th scope="row"><%= item.cmc_rank%></th>
+                <td><%= item.name %></td>
+                <td><%= item.symbol %></td>
+                <td><%= item.quote.USD.market_cap %></td>
+                <td><%= item.quote.USD.price %></td>
+                <td><%= item.circulating_supply %></td>
+                <td><%= item.quote.USD.volume_24h %></td>
+                <td><a class="btn btn-primary" href="#">Add To Watchlist</a></td>
+                <td><a class="btn btn-primary" href="#">Buy</a></td>
+                <td><a class="btn btn-primary" href="#">Sell</a></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+<%- include('../partials/footer'); %>
