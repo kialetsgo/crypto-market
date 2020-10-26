@@ -1,5 +1,55 @@
 <%- include('../partials/header'); %>
-<div class="container mb-5">
-    <h1>Welcome</h1>
+<div class="container mt-3 ">
+    <div class="row">
+        <div class="col">
+            <div class="text-left">
+                <h1 id="watchlist">Watchlist</h1>
+                <table id="main-table" class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Symbol</th>
+                            <th scope="col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col">
+            <div class="text-left">
+                <h1>Wallet</h1>
+                <section>
+                    <h3>You have left</h3>
+                </section>
+            </div>
+        </div>
+    </div>
+    <h1 id="portfolio">Portfolio</h1>
+    <table id="main-table" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% accountDetails.coins.forEach((item,idx) => { %>
+            <tr>
+                <td><%= item.coin_name %></td>
+                <td><%= item.symbol %></td>
+                <td><%= item.quantity%></td>
+                <td>
+                    <form method="POST" action="/user/transaction/?_method=PUT">
+                        <button type="submit" class="btn btn-danger">Sell</button>
+                    </form>
+                </td>
+                <% }) %>
+
+            </tr>
+        </tbody>
+    </table>
 </div>
 <%- include('../partials/footer'); %>

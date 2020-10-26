@@ -19,6 +19,7 @@ mongoose.set('useFindAndModify', false)
 // enable dependencies to run on express 
 app.set('view engine', 'ejs')
 app.use(methodOverride('_method'))
+app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -46,6 +47,10 @@ app.post('/user/login', guestOnlyMiddleware, userControllers.login)
 /// USER-ONLY ROUTES ///
 // user dashboard
 app.get('/user/dashboard', authenticatedOnlyMiddleware, userControllers.dashboard)
+// user transaction form
+app.get('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.showTransactionForm)
+// user purchase
+app.post('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.updateUserPortfolio)
 // user logout
 app.post('/user/logout', authenticatedOnlyMiddleware, userControllers.logout)
 

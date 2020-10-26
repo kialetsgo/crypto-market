@@ -1,6 +1,10 @@
 const uuid = require('uuid')
 const SHA256 = require("crypto-js/sha256")
 const UserModel = require('../models/users')
+const coinModel = require('../models/testmodels')
+const UserAccountModel = require('../models/usersAccount')
+const jsdom = require("jsdom");
+
 
 const controllers = {
     showRegistrationForm: (req, res) => {
@@ -22,7 +26,7 @@ const controllers = {
             email: req.body.email
         })
             .then(result => {
-                // if found in DB, means email has already been take, redirect to registration page
+                // if found in DB, means email has already been taken, redirect to registration page
                 if (result) {
                     res.redirect('/user/register')
                     return
@@ -48,9 +52,14 @@ const controllers = {
                     hash: hash
                 })
                     .then(createResult => {
-                        res.redirect('/')
+                        UserAccountModel.create({
+                            email: createResult.email,
+                            coins: []
+                        })
+                        res.redirect('/user/dashboard')
                     })
                     .catch(err => {
+                        console.log(err)
                         res.redirect('/user/register')
                     })
             })
@@ -95,15 +104,115 @@ const controllers = {
             })
     },
     dashboard: (req, res) => {
-        res.render('users/dashboard', {
-            pageTitle: "Welcome to your account"
+        UserAccountModel.findOne({
+            email: req.session.user.email
         })
+            .then(userResult => {
+                console.log('dashboard')
+                if (!userResult) {
+                    res.redirect('/user/login')
+                    return
+                }
+                res.render('users/dashboard', {
+                    pageTitle: "Dashboard",
+                    accountDetails: userResult
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                res.redirect('/user/login')
+            })
     },
     logout: (req, res) => {
         req.session.destroy()
         res.redirect('/user/login')
-    }
+    },
+    showTransactionForm: (req, res) => {
+        let selectedCoinSlug = req.params.slug
+        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
+        res.render('users/transaction', {
+            pageTitle: "Transaction Form",
+            item: selectedCoin,
+        })
+    },
+    updateUserPortfolio: (req, res) => {
+        let selectedCoinSlug = req.params.slug
+        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
 
+        let newCoin = {
+            coin_name: selectedCoin.name,
+            quantity: req.body.qty,
+            symbol: selectedCoin.symbol,
+            slug: selectedCoin.slug,
+            rank: selectedCoin.cmc_rank,
+            purchase_price: selectedCoin.quote.USD.price,
+        }
+
+        UserModel.findOne({
+            email: req.session.user.email
+        })
+            .then(userResult => {
+                if (!userResult) {
+                    res.redirect('/user/login')
+                    return
+                }
+                UserAccountModel.findOne({
+                    coins: {
+                        $elemMatch: {
+                            slug: selectedCoinSlug
+                        }
+                    }
+                })
+                    .then(slugResult => {
+                        console.log("nice slug result")
+                        if (!slugResult) {
+                            UserAccountModel.findOneAndUpdate({
+                                email: req.session.user.email,
+                            }, {
+                                $push: { coins: newCoin }
+                            })
+                                .then(newCoinResult => {
+                                    res.redirect('/user/dashboard')
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                        }
+                        else {
+                            UserAccountModel.findOneAndUpdate({
+                                slugResult: {
+                                    $elemMatch: {
+                                        slug: selectedCoinSlug
+                                    }
+                                }
+                            },
+                                {
+                                    coins: [{
+                                        coin_name: selectedCoin.name,
+                                        quantity: slugResult.qty + req.body.qty,
+                                        symbol: selectedCoin.symbol,
+                                        slug: selectedCoin.slug,
+                                        rank: selectedCoin.cmc_rank,
+                                        purchase_price: selectedCoin.quote.USD.price,
+                                    },]
+                                })
+                                .then(createResult => {
+                                    console.log("nice create result")
+                                    res.redirect('/')
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    res.redirect('/user/login')
+                                })
+                        }
+                    })
+            })
+            .catch(err => {
+                console.log(err)
+                res.redirect('/user/login')
+            })
+
+    }
 }
 
 

@@ -1,0 +1,38 @@
+<%- include('../partials/header'); %>
+
+<div class="container">
+
+    <h1><%= pageTitle %></h1>
+
+    <form method="POST" action="/user/transaction/<%= item.slug%>">
+        <!-- Name -->
+        <div class="form-group">
+            <label for="product-name">CryptoCurrency</label>
+            <h2><%= item.name %></h2>
+        </div>
+
+        <!-- Symbol -->
+        <div class="form-group">
+            <label for="product-symbol">Symbol</label>
+            <h2><%= item.symbol %></h2>
+        </div>
+
+        <!-- Price -->
+        <div class=" form-group">
+            <label for="price">Current Price</label>
+            <h2>
+                <%= item.quote.USD.price%>
+            </h2>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+            <label for="qty">Quantity</label>
+            <input type="number" class="form-control" name="qty" id="qty" min="1" value="1">
+        </div>
+        <button type="submit" class="btn btn-primary">Purchase</button>
+    </form>
+
+</div>
+
+<%- include('../partials/footer'); %>

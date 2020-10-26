@@ -6,14 +6,13 @@
     <table id="main-table" class="table">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">No.</th>
+                <th data-sort-method='number' scope="col">No.</th>
                 <th scope="col">Name</th>
                 <th scope="col">Symbol</th>
                 <th scope="col">Market Cap</th>
                 <th scope="col">Price</th>
                 <th scope="col">Circulating Supply</th>
                 <th scope="col">Volume(24h)</th>
-                <th scope="col"></th>
                 <th scope="col"></th>
                 <th scope="col"></th>
             </tr>
@@ -28,9 +27,12 @@
                 <td><%= item.quote.USD.price %></td>
                 <td><%= item.circulating_supply %></td>
                 <td><%= item.quote.USD.volume_24h %></td>
-                <td><a class="btn btn-primary" href="#">Add To Watchlist</a></td>
-                <td><a class="btn btn-primary" href="#">Buy</a></td>
-                <td><a class="btn btn-primary" href="#">Sell</a></td>
+                <td>
+                    <form method="POST" action="#">
+                        <button type="submit" class="btn btn-primary">Add to Watchlist</button>
+                    </form>
+                </td>
+                <td><a class="btn btn-primary" href="/user/transaction/<%= item.slug %>">Buy</a></td>
             </tr>
             <% }) %>
         </tbody>
