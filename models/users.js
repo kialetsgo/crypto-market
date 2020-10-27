@@ -25,24 +25,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    addresses: [
-        addr_line1 = {
-            required: true,
-            type: String,
-        },
-        addr_line2 = String,
-        unit = String,
-        postal = {
-            required: true,
-            type: String
-        },
-        city = String,
-        state = String,
-        country = {
-            required: true,
-            type: String
-        }
-    ],
     created_at: {
         required: true,
         type: Date,

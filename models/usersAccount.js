@@ -10,19 +10,15 @@ const userAccountSchema = new mongoose.Schema({
     coins: [
         {
             coin_name: {
-                unique: true,
                 type: String
             },
             symbol: String,
             slug: {
-                unique: true,
                 type: String,
             },
             rank: {
-                unique: true,
                 type: String,
             },
-            purchase_price: Number,
             quantity: {
                 type: Number,
                 min: 1,

@@ -50,7 +50,7 @@ app.get('/user/dashboard', authenticatedOnlyMiddleware, userControllers.dashboar
 // user transaction form
 app.get('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.showTransactionForm)
 // user purchase
-app.post('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.updateUserPortfolio)
+app.post('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.buyCoins)
 // user logout
 app.post('/user/logout', authenticatedOnlyMiddleware, userControllers.logout)
 
