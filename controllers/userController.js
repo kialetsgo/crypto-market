@@ -1,3 +1,4 @@
+'use strict'
 const uuid = require('uuid')
 const SHA256 = require("crypto-js/sha256")
 const UserModel = require('../models/users')
@@ -225,7 +226,8 @@ const controllers = {
                                             }
                                         },
                                             {
-                                                coins: slugResult.coins
+                                                coins: slugResult.coins,
+                                                acc_balance: newAcc_balance
                                             })
                                             .then(createResult => {
                                                 console.log("updated repeated")
