@@ -13,6 +13,7 @@
                         </tr>
                     </thead>
                     <tbody>
+
                     </tbody>
                 </table>
             </div>
@@ -42,7 +43,7 @@
                 <td><%= item.symbol %></td>
                 <td><%= item.quantity%></td>
                 <td>
-                    <form method="POST" action="/user/transaction/?_method=PUT">
+                    <form method="POST" action="/user/dashboard?_method=PUT">
                         <button type="submit" class="btn btn-danger">Sell</button>
                     </form>
                 </td>

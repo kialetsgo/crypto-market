@@ -109,6 +109,40 @@ const controllers = {
                 res.redirect('/user/login')
             })
     },
+    addToWatchlist: (req, res) => {
+        let selectedCoinSlug = req.params.slug
+        console.log(selectedCoinSlug)
+        let result = slugResult.watch.findIndex(item => item.slug === selectedCoinSlug)
+        let resultCoin = slugResult.coins[result]
+
+        slugResult.coins[result] = {
+            coin_name: selectedCoin.name,
+            quantity: resultCoin.quantity + parseInt(req.body.qty),
+            symbol: selectedCoin.symbol,
+            slug: selectedCoin.slug,
+            rank: selectedCoin.cmc_rank,
+        }
+        UserAccountModel.findOne({
+            email: req.session.user.email
+        })
+            .then(userAccountResult => {
+                if (!userAccountResult) {
+                    res.redirect('/user/login')
+                    return
+                }
+                UserAccountModel.findOneAndupdate(
+                    {
+                        email: req.session.user.email
+                    },
+                    {
+                        $push: { watchlist: newCoin },
+                    })
+            })
+            .catch(err => {
+                console.log(err)
+                res.redirect('/user/login')
+            })
+    },
     dashboard: (req, res) => {
         UserAccountModel.findOne({
             email: req.session.user.email
@@ -179,8 +213,6 @@ const controllers = {
                                 let newAcc_balance = acc_balance - (selectedCoin.quote.USD.price * req.body.qty)
                                 if (!slugResult) {
                                     console.log('new')
-                                    // console.log(req.body.qty)
-                                    // console.log(selectedCoin.quote.USD.price * req.body.qty)
                                     if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
                                         console.log("not enough money")
                                         res.redirect("/user/dashboard")

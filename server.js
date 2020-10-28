@@ -48,6 +48,8 @@ app.post('/user/login', guestOnlyMiddleware, userControllers.login)
 /// USER-ONLY ROUTES ///
 // user dashboard
 app.get('/user/dashboard', authenticatedOnlyMiddleware, userControllers.dashboard)
+// add to watchlist
+app.post('/user/dashboard', authenticatedOnlyMiddleware, userControllers.addToWatchlist)
 // user transaction form
 app.get('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.showTransactionForm)
 // user purchase

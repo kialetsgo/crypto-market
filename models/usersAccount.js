@@ -8,18 +8,20 @@ const userAccountSchema = new mongoose.Schema({
         unique: true,
         type: String
     },
+    watchlist: [
+        {
+            coin_name: String,
+            symbol: String,
+            slug: String,
+            price: Number,
+        }
+    ],
     coins: [
         {
-            coin_name: {
-                type: String
-            },
+            coin_name: String,
             symbol: String,
-            slug: {
-                type: String,
-            },
-            rank: {
-                type: String,
-            },
+            slug: String,
+            rank: String,
             quantity: {
                 type: Number,
                 min: 1,
