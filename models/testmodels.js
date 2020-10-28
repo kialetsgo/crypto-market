@@ -1,4 +1,4 @@
-{
+module.exports = {
     "status": {
         "timestamp": "2020-10-24T06:32:03.858Z",
         "error_code": 0,
