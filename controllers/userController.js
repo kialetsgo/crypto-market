@@ -110,38 +110,41 @@ const controllers = {
             })
     },
     addToWatchlist: (req, res) => {
+        console.log("hi")
+        res.send('.')
         let selectedCoinSlug = req.params.slug
-        console.log(selectedCoinSlug)
-        let result = slugResult.watch.findIndex(item => item.slug === selectedCoinSlug)
-        let resultCoin = slugResult.coins[result]
 
-        slugResult.coins[result] = {
-            coin_name: selectedCoin.name,
-            quantity: resultCoin.quantity + parseInt(req.body.qty),
-            symbol: selectedCoin.symbol,
-            slug: selectedCoin.slug,
-            rank: selectedCoin.cmc_rank,
-        }
-        UserAccountModel.findOne({
-            email: req.session.user.email
-        })
-            .then(userAccountResult => {
-                if (!userAccountResult) {
-                    res.redirect('/user/login')
-                    return
-                }
-                UserAccountModel.findOneAndupdate(
-                    {
-                        email: req.session.user.email
-                    },
-                    {
-                        $push: { watchlist: newCoin },
-                    })
-            })
-            .catch(err => {
-                console.log(err)
-                res.redirect('/user/login')
-            })
+        // console.log(selectedCoinSlug)
+        // let result = slugResult.watch.findIndex(item => item.slug === selectedCoinSlug)
+        // let resultCoin = slugResult.coins[result]
+
+        // slugResult.coins[result] = {
+        //     coin_name: selectedCoin.name,
+        //     quantity: resultCoin.quantity + parseInt(req.body.qty),
+        //     symbol: selectedCoin.symbol,
+        //     slug: selectedCoin.slug,
+        //     rank: selectedCoin.cmc_rank,
+        // }
+        // UserAccountModel.findOne({
+        //     email: req.session.user.email
+        // })
+        //     .then(userAccountResult => {
+        //         if (!userAccountResult) {
+        //             res.redirect('/user/login')
+        //             return
+        //         }
+        //         UserAccountModel.findOneAndupdate(
+        //             {
+        //                 email: req.session.user.email
+        //             },
+        //             {
+        //                 $push: { watchlist: newCoin },
+        //             })
+        //     })
+        //     .catch(err => {
+        //         console.log(err)
+        //         res.redirect('/user/login')
+        //     })
     },
     dashboard: (req, res) => {
         UserAccountModel.findOne({

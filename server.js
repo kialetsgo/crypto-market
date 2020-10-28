@@ -49,11 +49,12 @@ app.post('/user/login', guestOnlyMiddleware, userControllers.login)
 // user dashboard
 app.get('/user/dashboard', authenticatedOnlyMiddleware, userControllers.dashboard)
 // add to watchlist
-app.post('/user/dashboard', authenticatedOnlyMiddleware, userControllers.addToWatchlist)
+app.post('/user/watchlist/:slug', authenticatedOnlyMiddleware, userControllers.addToWatchlist)
 // user transaction form
 app.get('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.showTransactionForm)
 // user purchase
 app.post('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.buyCoins)
+
 // user logout
 app.post('/user/logout', authenticatedOnlyMiddleware, userControllers.logout)
 

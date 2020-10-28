@@ -1,5 +1,5 @@
 'use strict'
-const coinModel = require('../models/testmodels')
+const coinModel = require('../models/testmodels.json')
 const controllers = {
     listProducts: (req, res) => {
         res.render('coins/index', {
