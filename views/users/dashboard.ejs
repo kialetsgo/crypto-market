@@ -9,11 +9,19 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Symbol</th>
-                            <th scope="col">Price</th>
+                            <th scope="col">Current Price</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                    <tbody>
+                        <% accountDetails.watchlist.forEach((item,idx) => { %>
+                        <tr>
+                            <td><%= item.coin_name %></td>
+                            <td><%= item.symbol %></td>
+                            <td><%= item.price%></td>
+                            <% }) %>
+                        </tr>
+                    </tbody>
                     </tbody>
                 </table>
             </div>
@@ -34,6 +42,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Symbol</th>
                 <th scope="col">Qty</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +53,7 @@
                 <td><%= item.quantity%></td>
                 <td>
                     <form method="POST" action="/user/dashboard?_method=PUT">
-                        <button type="submit" class="btn btn-danger">Sell</button>
+                        <button type="submit" class="btn btn-danger"> Sell </button>
                     </form>
                 </td>
                 <% }) %>

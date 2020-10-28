@@ -110,41 +110,49 @@ const controllers = {
             })
     },
     addToWatchlist: (req, res) => {
-        console.log("hi")
-        res.send('.')
         let selectedCoinSlug = req.params.slug
+        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
+        let newCoin =
+        {
+            coin_name: selectedCoin.name,
+            symbol: selectedCoin.symbol,
+            slug: selectedCoinSlug,
+            price: selectedCoin.quote.USD.price,
+        }
 
-        // console.log(selectedCoinSlug)
-        // let result = slugResult.watch.findIndex(item => item.slug === selectedCoinSlug)
-        // let resultCoin = slugResult.coins[result]
+        UserAccountModel.findOne({
+            email: req.session.user.email,
+            watchlist: {
+                $elemMatch: {
+                    slug: selectedCoinSlug
+                }
+            }
+        })
+            .then(slugResult => {
+                console.log(slugResult)
+                console.log(selectedCoin)
+                if (!slugResult) {
+                    console.log('new')
+                    UserAccountModel.findOneAndUpdate({
+                        email: req.session.user.email,
+                    }, {
+                        $push: { watchlist: newCoin },
+                    })
+                        .then(newCoinResult => {
+                            res.redirect('/user/dashboard')
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                    return
+                }
+                console.log('already added')
+                res.redirect('/user/dashboard')
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
-        // slugResult.coins[result] = {
-        //     coin_name: selectedCoin.name,
-        //     quantity: resultCoin.quantity + parseInt(req.body.qty),
-        //     symbol: selectedCoin.symbol,
-        //     slug: selectedCoin.slug,
-        //     rank: selectedCoin.cmc_rank,
-        // }
-        // UserAccountModel.findOne({
-        //     email: req.session.user.email
-        // })
-        //     .then(userAccountResult => {
-        //         if (!userAccountResult) {
-        //             res.redirect('/user/login')
-        //             return
-        //         }
-        //         UserAccountModel.findOneAndupdate(
-        //             {
-        //                 email: req.session.user.email
-        //             },
-        //             {
-        //                 $push: { watchlist: newCoin },
-        //             })
-        //     })
-        //     .catch(err => {
-        //         console.log(err)
-        //         res.redirect('/user/login')
-        //     })
     },
     dashboard: (req, res) => {
         UserAccountModel.findOne({
