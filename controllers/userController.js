@@ -129,8 +129,6 @@ const controllers = {
             }
         })
             .then(slugResult => {
-                console.log(slugResult)
-                console.log(selectedCoin)
                 if (!slugResult) {
                     console.log('new')
                     UserAccountModel.findOneAndUpdate({
@@ -152,6 +150,52 @@ const controllers = {
             .catch(err => {
                 console.log(err)
             })
+    },
+    deleteWatchlistItem: (req, res) => {
+        let selectedCoinSlug = req.params.slug
+
+        UserAccountModel.findOne({
+            email: req.session.user.email,
+            watchlist: {
+                $elemMatch: {
+                    slug: selectedCoinSlug
+                }
+            }
+        })
+            .then(slugResult => {
+                console.log(slugResult)
+                let result = slugResult.watchlist.findIndex(item => item.slug === selectedCoinSlug)
+                console.log(result)
+                let resultCoin = slugResult.watchlist[result]
+                console.log(resultCoin)
+                if (!slugResult) {
+                    res.redirect("/user/dashboard")
+                    return
+                }
+                UserAccountModel.findOneAndUpdate({
+                    email: req.session.user.email,
+                    watchlist: {
+                        $elemMatch: {
+                            slug: selectedCoinSlug
+                        }
+                    }
+                },
+                    {
+                        $pull: { watchlist: resultCoin }
+                    })
+
+
+                    .then(result => {
+                        res.redirect("/user/dashboard")
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
 
     },
     dashboard: (req, res) => {
@@ -188,7 +232,6 @@ const controllers = {
     buyCoins: (req, res) => {
         let selectedCoinSlug = req.params.slug
         let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
-
         let newCoin = {
             coin_name: selectedCoin.name,
             quantity: req.body.qty,
@@ -196,7 +239,7 @@ const controllers = {
             slug: selectedCoin.slug,
             rank: selectedCoin.cmc_rank
         }
-        console.log(req.session)
+
         UserModel.findOne({
             email: req.session.user.email
         })
@@ -255,6 +298,7 @@ const controllers = {
                                         slug: selectedCoin.slug,
                                         rank: selectedCoin.cmc_rank,
                                     }
+
                                     if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
                                         console.log("not enough money")
                                         res.redirect("/user/dashboard")
@@ -291,6 +335,92 @@ const controllers = {
                 res.redirect('/user/login')
             })
 
+    },
+    sellCoins: (req, res) => {
+        let selectedCoinSlug = req.params.slug
+        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
+        let sellQty = parseInt(req.body.qty)
+        UserAccountModel.findOne({
+            email: req.session.user.email,
+            coins: {
+                $elemMatch: {
+                    slug: selectedCoinSlug
+                }
+            }
+        })
+            .then(slugResult => {
+                let result = slugResult.coins.findIndex(item => item.slug === selectedCoinSlug)
+                let resultCoin = slugResult.coins[result]
+                let resultCoinQty = resultCoin.quantity
+                let newAccBalance = slugResult.acc_balance + (resultCoinQty * selectedCoin.quote.USD.price)
+
+                if (!slugResult) {
+                    res.redirect("/user/dashboard")
+                    return
+                }
+
+                if (resultCoin.quantity === sellQty) {
+                    UserAccountModel.findOneAndUpdate({
+                        email: req.session.user.email,
+                        coins: {
+                            $elemMatch: {
+                                slug: selectedCoinSlug
+                            }
+                        }
+                    },
+                        {
+                            $pull: { coins: resultCoin },
+                            acc_balance: newAccBalance
+                        })
+
+
+                        .then(result => {
+                            console.log('sell all particular coins')
+                            res.redirect("/user/dashboard")
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                }
+                else {
+                    let newAccBalance = slugResult.acc_balance + (sellQty * selectedCoin.quote.USD.price)
+                    let newCoinBalance = resultCoinQty - sellQty
+                    // assign new coin balance to a certain coin with index: "result"
+                    slugResult.coins[result] = {
+                        coin_name: selectedCoin.name,
+                        quantity: newCoinBalance,
+                        symbol: selectedCoin.symbol,
+                        slug: selectedCoin.slug,
+                        rank: selectedCoin.cmc_rank,
+                    }
+                    console.log(slugResult.coins)
+
+                    UserAccountModel.findOneAndUpdate({
+                        email: req.session.user.email,
+                        coins: {
+                            $elemMatch: {
+                                slug: selectedCoinSlug
+                            }
+                        }
+                    },
+                        {
+                            coins: slugResult.coins,
+                            acc_balance: newAccBalance
+                        })
+
+
+                        .then(result => {
+                            res.redirect("/user/dashboard")
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                }
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }
 }
 

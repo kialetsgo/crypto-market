@@ -50,11 +50,14 @@ app.post('/user/login', guestOnlyMiddleware, userControllers.login)
 app.get('/user/dashboard', authenticatedOnlyMiddleware, userControllers.dashboard)
 // add to watchlist
 app.post('/user/watchlist/:slug', authenticatedOnlyMiddleware, userControllers.addToWatchlist)
+// delete watchlist item
+app.put('/user/watchlist/:slug', authenticatedOnlyMiddleware, userControllers.deleteWatchlistItem)
 // user transaction form
 app.get('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.showTransactionForm)
 // user purchase
 app.post('/user/transaction/:slug', authenticatedOnlyMiddleware, userControllers.buyCoins)
-
+// sell coins
+app.put('/user/sell/:slug', authenticatedOnlyMiddleware, userControllers.sellCoins)
 // user logout
 app.post('/user/logout', authenticatedOnlyMiddleware, userControllers.logout)
 

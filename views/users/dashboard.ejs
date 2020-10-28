@@ -10,18 +10,22 @@
                             <th scope="col">Name</th>
                             <th scope="col">Symbol</th>
                             <th scope="col">Current Price</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
-                    <tbody>
                     <tbody>
                         <% accountDetails.watchlist.forEach((item,idx) => { %>
                         <tr>
                             <td><%= item.coin_name %></td>
                             <td><%= item.symbol %></td>
                             <td><%= item.price%></td>
-                            <% }) %>
+                            <td>
+                                <form method="POST" action="/user/watchlist/<%=item.slug%>?_method=PUT">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
-                    </tbody>
+                        <% }) %>
                     </tbody>
                 </table>
             </div>
@@ -42,6 +46,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Symbol</th>
                 <th scope="col">Qty</th>
+                <th scope="col">Qty to sell</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -52,13 +57,14 @@
                 <td><%= item.symbol %></td>
                 <td><%= item.quantity%></td>
                 <td>
-                    <form method="POST" action="/user/dashboard?_method=PUT">
+                    <form method="POST" action="/user/sell/<%=item.slug%>?_method=PUT">
+                        <input type="number" class="form-control" name="qty" id="qty" min="1" max="<%= item.quantity %>"
+                            value="1">
                         <button type="submit" class="btn btn-danger"> Sell </button>
                     </form>
                 </td>
-                <% }) %>
-
             </tr>
+            <% }) %>
         </tbody>
     </table>
 </div>
