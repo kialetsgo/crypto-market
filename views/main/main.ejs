@@ -1,0 +1,36 @@
+<%- include('../partials/header'); %>
+
+
+<div class="container hero">
+    <div class="row">
+        <div class="col-12 col-lg-6 col-xl-5 offset-xl-1 mr-3">
+            <p class="text-center"><img src="/img/coins.png"></p>
+            <h1>The revolution is here.</h1>
+            <p> The ideal platform to get your financial feet wet! Submit trades in a virtual environment before you
+                start risking your own capital.</p>
+        </div>
+        <div class="col-md-5 col-lg-5 offset-lg-1 offset-xl-0 ml-3">
+            <form method="POST" action="/user/login">
+                <!-- Email -->
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Email address">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <div class="seperator"></div>
+                <a class="btn btn-success action-button btn-block" role="button" href="/user/register">Create New
+                    Account</a>
+            </form>
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+<%- include('../partials/footer'); %>

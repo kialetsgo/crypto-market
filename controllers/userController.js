@@ -34,7 +34,7 @@ const controllers = {
                 // no document found in DB, can proceed with registration
                 console.log(req.body.password)
                 console.log(req.body.password2)
-                if (req.body.password1 !== req.body.password2) {
+                if (req.body.password1 === req.body.password2) {
                     res.redirect('/user/register')
                     console.log('2nd password wrong')
                     return
@@ -214,23 +214,33 @@ const controllers = {
 
     },
     dashboard: (req, res) => {
-        UserAccountModel.findOne({
-            email: req.session.user.email
-        })
-            .then(userResult => {
-                if (!userResult) {
-                    res.redirect('/user/login')
-                    return
-                }
-                res.render('users/dashboard', {
-                    pageTitle: "Account",
-                    accountDetails: userResult
+        coinModel()
+            .then(results => {
+                let currentCoinData = results
+                UserAccountModel.findOne({
+                    email: req.session.user.email
                 })
+                    .then(userResult => {
+                        if (!userResult) {
+                            res.redirect('/user/login')
+                            return
+                        }
+                        res.render('users/dashboard', {
+                            pageTitle: "Account",
+                            accountDetails: userResult,
+                            currencies: currentCoinData
+                        })
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.redirect('/user/login')
+                    })
+
             })
             .catch(err => {
                 console.log(err)
-                res.redirect('/user/login')
             })
+
     },
     logout: (req, res) => {
         req.session.destroy()
@@ -242,7 +252,7 @@ const controllers = {
             .then(results => {
                 let selectedCoin = results.data.find(item => item.slug === selectedCoinSlug)
                 res.render('users/transaction', {
-                    pageTitle: "Transaction Form",
+                    pageTitle: "Purchase Form",
                     item: selectedCoin,
                 })
             })

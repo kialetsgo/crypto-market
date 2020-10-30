@@ -35,16 +35,22 @@ app.use(session({
 app.use(setUserVarMiddleware)
 
 /// MAIN ROUTES ///
+// main/login route
+app.get('/', (req, res) => {
+    res.render('main/main', {
+        pageTitle: "Crypto-Market"
+    })
+})
+
 // index route
-// app.get('/', coinControllers.listProducts)
-app.get('/', coinControllers.listProducts)
+app.get('/coins', coinControllers.listProducts)
 
 /// REGISTER/LOGIN ROUTES ///
 // user registration form 
 app.get("/user/register", guestOnlyMiddleware, userControllers.showRegistrationForm)
 // user registration
 app.post('/user/register', guestOnlyMiddleware, userControllers.register)
-// user login
+// // user login
 app.get('/user/login', guestOnlyMiddleware, userControllers.showLoginForm)
 // user login route
 app.post('/user/login', guestOnlyMiddleware, userControllers.login)

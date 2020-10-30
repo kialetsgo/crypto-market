@@ -5,7 +5,7 @@ const controllers = {
         coinModel()
             .then(results => {
                 res.render('coins/index', {
-                    pageTitle: "Crypto Market",
+                    pageTitle: "Cryptocurrencies",
                     pageHeader: "All cryptocurrencies",
                     currencies: results
                 })

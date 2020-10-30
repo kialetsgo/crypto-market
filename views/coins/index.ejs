@@ -3,17 +3,16 @@
     <div class="ticker-wrap">
         <div class="ticker-move">
             <% currencies.data.forEach(item => { %>
-            <div class="ticker-item"> <%= item.symbol%>: <%= item.quote.USD.price%></div>
+            <div class="ticker-item"> <%= item.symbol%>: $<%= item.quote.USD.price%></div>
             <% }) %>
         </div>
     </div>
 </div>
-<div class="container">
+<div class="container text-center">
     <div class="jumbotron mt-5">
         <h1 class="display-4"><%= pageHeader %></h1>
         <p class="lead">This is a simple cryptocurrency market simulator.</p>
         <hr class="my-4">
-        <p>Sign up now to get a free $20000 credit! Offers end soon.</p>
     </div>
     <table id="main-table" class="styled-table">
         <thead class="thead-dark">

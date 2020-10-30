@@ -1,10 +1,19 @@
 <%- include('../partials/header'); %>
+<div class="tcontainer">
+    <div class="ticker-wrap">
+        <div class="ticker-move">
+            <% currencies.data.forEach(item => { %>
+            <div class="ticker-item"> <%= item.symbol%>: $<%= item.quote.USD.price%></div>
+            <% }) %>
+        </div>
+    </div>
+</div>
 <div class="container mt-3 ">
     <div class="row">
         <div class="col">
             <div class="text-left">
                 <h1 id="watchlist">Watchlist</h1>
-                <table id="main-table" class="table">
+                <table id="main-table" class="styled-table">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">Name</th>
@@ -31,16 +40,18 @@
             </div>
         </div>
         <div class="col">
-            <div class="text-left">
-                <h1>Account Balance</h1>
-                <section>
-                    <h3>You have $<%= accountDetails.acc_balance%> in your account</h3>
-                </section>
+            <div class="jumbotron mt-5">
+                <h1 class="display-4">Account Balance</h1>
+                <hr class="my-4">
+                <p class="lead">You have <span
+                        style="color:blue;font-weight:bold">$<%= accountDetails.acc_balance%></span> in
+                    your account.</p>
+
             </div>
         </div>
     </div>
     <h1 id="portfolio">Portfolio</h1>
-    <table id="main-table" class="table">
+    <table id="main-table" class="styled-table">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Name</th>
@@ -60,7 +71,7 @@
                     <form method="POST" action="/user/sell/<%=item.slug%>?_method=PUT">
                         <input type="number" class="form-control" name="qty" id="qty" min="1" max="<%= item.quantity %>"
                             value="1">
-                        <button type="submit" class="btn btn-danger"> Sell </button>
+                        <button type="submit" class="btn btn-danger btn-block"> Sell </button>
                     </form>
                 </td>
             </tr>
