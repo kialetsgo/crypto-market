@@ -13,6 +13,9 @@ const port = 5000;
 const coinControllers = require('./controllers/coinController')
 const userControllers = require('./controllers/userController')
 
+// api call results
+const apiResults = require('./callApi')
+
 // mongoose 
 const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}`
 mongoose.set('useFindAndModify', false)
@@ -33,6 +36,7 @@ app.use(setUserVarMiddleware)
 
 /// MAIN ROUTES ///
 // index route
+// app.get('/', coinControllers.listProducts)
 app.get('/', coinControllers.listProducts)
 
 /// REGISTER/LOGIN ROUTES ///

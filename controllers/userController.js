@@ -2,7 +2,7 @@
 const uuid = require('uuid')
 const SHA256 = require("crypto-js/sha256")
 const UserModel = require('../models/users')
-const coinModel = require('../models/testmodels')
+const coinModel = require('../callApi')
 const UserAccountModel = require('../models/usersAccount')
 
 const controllers = {
@@ -111,45 +111,52 @@ const controllers = {
     },
     addToWatchlist: (req, res) => {
         let selectedCoinSlug = req.params.slug
-        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
-        let newCoin =
-        {
-            coin_name: selectedCoin.name,
-            symbol: selectedCoin.symbol,
-            slug: selectedCoinSlug,
-            price: selectedCoin.quote.USD.price,
-        }
+        coinModel()
+            .then(results => {
+                let selectedCoin = results.data.find(item => item.slug === selectedCoinSlug)
+                let newCoin =
+                {
+                    coin_name: selectedCoin.name,
+                    symbol: selectedCoin.symbol,
+                    slug: selectedCoinSlug,
+                    price: selectedCoin.quote.USD.price,
+                }
 
-        UserAccountModel.findOne({
-            email: req.session.user.email,
-            watchlist: {
-                $elemMatch: {
-                    slug: selectedCoinSlug
-                }
-            }
-        })
-            .then(slugResult => {
-                if (!slugResult) {
-                    console.log('new')
-                    UserAccountModel.findOneAndUpdate({
-                        email: req.session.user.email,
-                    }, {
-                        $push: { watchlist: newCoin },
+                UserAccountModel.findOne({
+                    email: req.session.user.email,
+                    watchlist: {
+                        $elemMatch: {
+                            slug: selectedCoinSlug
+                        }
+                    }
+                })
+                    .then(slugResult => {
+                        if (!slugResult) {
+                            console.log('new')
+                            UserAccountModel.findOneAndUpdate({
+                                email: req.session.user.email,
+                            }, {
+                                $push: { watchlist: newCoin },
+                            })
+                                .then(newCoinResult => {
+                                    res.redirect('/user/dashboard')
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            return
+                        }
+                        console.log('already added')
+                        res.redirect('/user/dashboard')
                     })
-                        .then(newCoinResult => {
-                            res.redirect('/user/dashboard')
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    return
-                }
-                console.log('already added')
-                res.redirect('/user/dashboard')
+                    .catch(err => {
+                        console.log(err)
+                    })
             })
             .catch(err => {
                 console.log(err)
             })
+
     },
     deleteWatchlistItem: (req, res) => {
         let selectedCoinSlug = req.params.slug
@@ -223,204 +230,223 @@ const controllers = {
     },
     showTransactionForm: (req, res) => {
         let selectedCoinSlug = req.params.slug
-        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
-        res.render('users/transaction', {
-            pageTitle: "Transaction Form",
-            item: selectedCoin,
-        })
+        coinModel()
+            .then(results => {
+                let selectedCoin = results.data.find(item => item.slug === selectedCoinSlug)
+                res.render('users/transaction', {
+                    pageTitle: "Transaction Form",
+                    item: selectedCoin,
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
     },
+
     buyCoins: (req, res) => {
         let selectedCoinSlug = req.params.slug
-        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
-        let newCoin = {
-            coin_name: selectedCoin.name,
-            quantity: req.body.qty,
-            symbol: selectedCoin.symbol,
-            slug: selectedCoin.slug,
-            rank: selectedCoin.cmc_rank
-        }
-
-        UserModel.findOne({
-            email: req.session.user.email
-        })
-            .then(userResult => {
-                if (!userResult) {
-                    res.redirect('/user/login')
-                    return
+        coinModel()
+            .then(results => {
+                let selectedCoin = results.data.find(item => item.slug === selectedCoinSlug)
+                let newCoin = {
+                    coin_name: selectedCoin.name,
+                    quantity: req.body.qty,
+                    symbol: selectedCoin.symbol,
+                    slug: selectedCoin.slug,
+                    rank: selectedCoin.cmc_rank
                 }
-                UserAccountModel.findOne({
-                    email: req.session.user.email,
+
+                UserModel.findOne({
+                    email: req.session.user.email
                 })
-                    .then(userAccountResult => {
-                        let acc_balance = userAccountResult.acc_balance
+                    .then(userResult => {
+                        if (!userResult) {
+                            res.redirect('/user/login')
+                            return
+                        }
                         UserAccountModel.findOne({
                             email: req.session.user.email,
-                            coins: {
-                                $elemMatch: {
-                                    slug: selectedCoinSlug
-                                }
-                            }
                         })
-                            .then(slugResult => {
-                                console.log(slugResult)
-                                console.log(selectedCoin)
-                                let newAcc_balance = acc_balance - (selectedCoin.quote.USD.price * req.body.qty)
-                                if (!slugResult) {
-                                    console.log('new')
-                                    if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
-                                        console.log("not enough money")
-                                        res.redirect("/user/dashboard")
+                            .then(userAccountResult => {
+                                let acc_balance = userAccountResult.acc_balance
+                                UserAccountModel.findOne({
+                                    email: req.session.user.email,
+                                    coins: {
+                                        $elemMatch: {
+                                            slug: selectedCoinSlug
+                                        }
                                     }
-                                    else {
-                                        UserAccountModel.findOneAndUpdate({
-                                            email: req.session.user.email,
-                                        }, {
-                                            $push: { coins: newCoin },
-                                            acc_balance: newAcc_balance
-                                        })
-                                            .then(newCoinResult => {
-                                                res.redirect('/user/dashboard')
-                                            })
-                                            .catch(err => {
-                                                console.log(err)
-                                            })
-                                    }
-                                }
-                                else {
-                                    let selectedCoinSlug = req.params.slug
-                                    let result = slugResult.coins.findIndex(item => item.slug === selectedCoinSlug)
-                                    let resultCoin = slugResult.coins[result]
-
-                                    slugResult.coins[result] = {
-                                        coin_name: selectedCoin.name,
-                                        quantity: resultCoin.quantity + parseInt(req.body.qty),
-                                        symbol: selectedCoin.symbol,
-                                        slug: selectedCoin.slug,
-                                        rank: selectedCoin.cmc_rank,
-                                    }
-
-                                    if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
-                                        console.log("not enough money")
-                                        res.redirect("/user/dashboard")
-                                    }
-                                    else {
-                                        UserAccountModel.findOneAndUpdate({
-                                            email: req.session.user.email,
-                                            coins: {
-                                                $elemMatch: {
-                                                    slug: selectedCoinSlug
-                                                }
+                                })
+                                    .then(slugResult => {
+                                        console.log(slugResult)
+                                        console.log(selectedCoin)
+                                        let newAcc_balance = acc_balance - (selectedCoin.quote.USD.price * req.body.qty)
+                                        if (!slugResult) {
+                                            console.log('new')
+                                            if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
+                                                console.log("not enough money")
+                                                res.redirect("/user/dashboard")
                                             }
-                                        },
-                                            {
-                                                coins: slugResult.coins,
-                                                acc_balance: newAcc_balance
-                                            })
-                                            .then(createResult => {
-                                                console.log("updated repeated")
-                                                res.redirect('/user/dashboard')
-                                            })
-                                            .catch(err => {
-                                                console.log(err)
-                                                res.redirect('/user/login')
-                                            })
-                                    }
+                                            else {
+                                                UserAccountModel.findOneAndUpdate({
+                                                    email: req.session.user.email,
+                                                }, {
+                                                    $push: { coins: newCoin },
+                                                    acc_balance: newAcc_balance
+                                                })
+                                                    .then(newCoinResult => {
+                                                        res.redirect('/user/dashboard')
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err)
+                                                    })
+                                            }
+                                        }
+                                        else {
+                                            let selectedCoinSlug = req.params.slug
+                                            let result = slugResult.coins.findIndex(item => item.slug === selectedCoinSlug)
+                                            let resultCoin = slugResult.coins[result]
 
-                                }
+                                            slugResult.coins[result] = {
+                                                coin_name: selectedCoin.name,
+                                                quantity: resultCoin.quantity + parseInt(req.body.qty),
+                                                symbol: selectedCoin.symbol,
+                                                slug: selectedCoin.slug,
+                                                rank: selectedCoin.cmc_rank,
+                                            }
+
+                                            if (selectedCoin.quote.USD.price * req.body.qty > acc_balance) {
+                                                console.log("not enough money")
+                                                res.redirect("/user/dashboard")
+                                            }
+                                            else {
+                                                UserAccountModel.findOneAndUpdate({
+                                                    email: req.session.user.email,
+                                                    coins: {
+                                                        $elemMatch: {
+                                                            slug: selectedCoinSlug
+                                                        }
+                                                    }
+                                                },
+                                                    {
+                                                        coins: slugResult.coins,
+                                                        acc_balance: newAcc_balance
+                                                    })
+                                                    .then(createResult => {
+                                                        console.log("updated repeated")
+                                                        res.redirect('/user/dashboard')
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err)
+                                                        res.redirect('/user/login')
+                                                    })
+                                            }
+
+                                        }
+                                    })
                             })
                     })
+                    .catch(err => {
+                        console.log(err)
+                        res.redirect('/user/login')
+                    })
+
             })
             .catch(err => {
                 console.log(err)
                 res.redirect('/user/login')
             })
-
     },
     sellCoins: (req, res) => {
         let selectedCoinSlug = req.params.slug
-        let selectedCoin = coinModel.data.find(item => item.slug === selectedCoinSlug)
-        let sellQty = parseInt(req.body.qty)
-        UserAccountModel.findOne({
-            email: req.session.user.email,
-            coins: {
-                $elemMatch: {
-                    slug: selectedCoinSlug
-                }
-            }
-        })
-            .then(slugResult => {
-                let result = slugResult.coins.findIndex(item => item.slug === selectedCoinSlug)
-                let resultCoin = slugResult.coins[result]
-                let resultCoinQty = resultCoin.quantity
-                let newAccBalance = slugResult.acc_balance + (resultCoinQty * selectedCoin.quote.USD.price)
-
-                if (!slugResult) {
-                    res.redirect("/user/dashboard")
-                    return
-                }
-
-                if (resultCoin.quantity === sellQty) {
-                    UserAccountModel.findOneAndUpdate({
-                        email: req.session.user.email,
-                        coins: {
-                            $elemMatch: {
-                                slug: selectedCoinSlug
-                            }
+        coinModel()
+            .then(results => {
+                let selectedCoin = results.data.find(item => item.slug === selectedCoinSlug)
+                let sellQty = parseInt(req.body.qty)
+                UserAccountModel.findOne({
+                    email: req.session.user.email,
+                    coins: {
+                        $elemMatch: {
+                            slug: selectedCoinSlug
                         }
-                    },
-                        {
-                            $pull: { coins: resultCoin },
-                            acc_balance: newAccBalance
-                        })
-
-
-                        .then(result => {
-                            console.log('sell all particular coins')
-                            res.redirect("/user/dashboard")
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                }
-                else {
-                    let newAccBalance = slugResult.acc_balance + (sellQty * selectedCoin.quote.USD.price)
-                    let newCoinBalance = resultCoinQty - sellQty
-                    // assign new coin balance to a certain coin with index: "result"
-                    slugResult.coins[result] = {
-                        coin_name: selectedCoin.name,
-                        quantity: newCoinBalance,
-                        symbol: selectedCoin.symbol,
-                        slug: selectedCoin.slug,
-                        rank: selectedCoin.cmc_rank,
                     }
-                    console.log(slugResult.coins)
+                })
+                    .then(slugResult => {
+                        let result = slugResult.coins.findIndex(item => item.slug === selectedCoinSlug)
+                        let resultCoin = slugResult.coins[result]
+                        let resultCoinQty = resultCoin.quantity
+                        let newAccBalance = slugResult.acc_balance + (resultCoinQty * selectedCoin.quote.USD.price)
 
-                    UserAccountModel.findOneAndUpdate({
-                        email: req.session.user.email,
-                        coins: {
-                            $elemMatch: {
-                                slug: selectedCoinSlug
-                            }
-                        }
-                    },
-                        {
-                            coins: slugResult.coins,
-                            acc_balance: newAccBalance
-                        })
-
-
-                        .then(result => {
+                        if (!slugResult) {
                             res.redirect("/user/dashboard")
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                }
+                            return
+                        }
 
+                        if (resultCoin.quantity === sellQty) {
+                            UserAccountModel.findOneAndUpdate({
+                                email: req.session.user.email,
+                                coins: {
+                                    $elemMatch: {
+                                        slug: selectedCoinSlug
+                                    }
+                                }
+                            },
+                                {
+                                    $pull: { coins: resultCoin },
+                                    acc_balance: newAccBalance
+                                })
+
+
+                                .then(result => {
+                                    console.log('sell all particular coins')
+                                    res.redirect("/user/dashboard")
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                        }
+                        else {
+                            let newAccBalance = slugResult.acc_balance + (sellQty * selectedCoin.quote.USD.price)
+                            let newCoinBalance = resultCoinQty - sellQty
+                            // assign new coin balance to a certain coin with index: "result"
+                            slugResult.coins[result] = {
+                                coin_name: selectedCoin.name,
+                                quantity: newCoinBalance,
+                                symbol: selectedCoin.symbol,
+                                slug: selectedCoin.slug,
+                                rank: selectedCoin.cmc_rank,
+                            }
+                            console.log(slugResult.coins)
+
+                            UserAccountModel.findOneAndUpdate({
+                                email: req.session.user.email,
+                                coins: {
+                                    $elemMatch: {
+                                        slug: selectedCoinSlug
+                                    }
+                                }
+                            },
+                                {
+                                    coins: slugResult.coins,
+                                    acc_balance: newAccBalance
+                                })
+
+
+                                .then(result => {
+                                    res.redirect("/user/dashboard")
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                        }
+
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
             })
-            .catch(err => {
-                console.log(err)
-            })
+
     }
 }
 

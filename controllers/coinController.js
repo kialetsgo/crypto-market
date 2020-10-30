@@ -1,12 +1,20 @@
 'use strict'
-const coinModel = require('../models/testmodels')
+const coinModel = require('../callApi')
 const controllers = {
     listProducts: (req, res) => {
-        res.render('coins/index', {
-            pageTitle: "Crypto Market",
-            pageHeader: "All cryptocurrencies",
-            currencies: coinModel
-        })
+        coinModel()
+            .then(results => {
+                console.log(results)
+                res.render('coins/index', {
+                    pageTitle: "Crypto Market",
+                    pageHeader: "All cryptocurrencies",
+                    currencies: results
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
     },
 }
 
