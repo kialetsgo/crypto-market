@@ -32,7 +32,15 @@ const controllers = {
                 }
 
                 // no document found in DB, can proceed with registration
+                console.log(req.body.password)
+                console.log(req.body.password2)
+                if (req.body.password1 !== req.body.password2) {
+                    res.redirect('/user/register')
+                    console.log('2nd password wrong')
+                    return
+                }
 
+                console.log('register successful')
                 // generate uuid as salt
                 const salt = uuid.v4()
 

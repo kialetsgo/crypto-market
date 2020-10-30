@@ -1,9 +1,21 @@
 <%- include('../partials/header'); %>
-<div class="container mb-5">
-    <div class="text-center mt-5 mb-5">
-        <h1><%= pageHeader %></h1>
+<div class="tcontainer">
+    <div class="ticker-wrap">
+        <div class="ticker-move">
+            <% currencies.data.forEach(item => { %>
+            <div class="ticker-item"> <%= item.symbol%>: <%= item.quote.USD.price%></div>
+            <% }) %>
+        </div>
     </div>
-    <table id="main-table" class="table table-borderless table-hover">
+</div>
+<div class="container">
+    <div class="jumbotron mt-5">
+        <h1 class="display-4"><%= pageHeader %></h1>
+        <p class="lead">This is a simple cryptocurrency market simulator.</p>
+        <hr class="my-4">
+        <p>Sign up now to get a free $20000 credit! Offers end soon.</p>
+    </div>
+    <table id="main-table" class="styled-table">
         <thead class="thead-dark">
             <tr>
                 <th data-sort-method='number' scope="col">No.</th>
@@ -19,7 +31,7 @@
         </thead>
         <tbody>
             <% currencies.data.forEach((item,idx) => { %>
-            <tr>
+            <tr class="zoom active-row">
                 <th scope="row"><%= item.cmc_rank%></th>
                 <td><%= item.name %></td>
                 <td><%= item.symbol %></td>

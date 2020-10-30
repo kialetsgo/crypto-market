@@ -4,7 +4,6 @@ const controllers = {
     listProducts: (req, res) => {
         coinModel()
             .then(results => {
-                console.log(results)
                 res.render('coins/index', {
                     pageTitle: "Crypto Market",
                     pageHeader: "All cryptocurrencies",
