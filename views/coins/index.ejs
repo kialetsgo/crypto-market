@@ -41,7 +41,7 @@
                 <td><%= item.quote.USD.volume_24h %></td>
                 <td>
                     <form method="POST" action="/user/watchlist/<%=item.slug%>">
-                        <button type="submit" class="btn btn-info">Add to Watchlist</button>
+                        <button type="submit" class="btn btn-info">Watchlist</button>
                     </form>
                 </td>
                 <td><a class="btn btn-success" href="/user/transaction/<%= item.slug %>">Buy</a></td>

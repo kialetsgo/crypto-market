@@ -16,7 +16,6 @@ async function axiosTest() {
         json: true,
         gzip: true
     })
-    console.log("ok")
     return response.data
 }
 module.exports = axiosTest
